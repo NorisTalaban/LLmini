@@ -1,5 +1,7 @@
 # LLmini — Scaling and Attention Dynamics in a Minimal Decoder-Only Transformer
 
+![Output](images/output.png)
+
 A GPT-style language model built from scratch in PyTorch, trained on ~14M tokens from 11 public English datasets. The project centers on an **ablation study across three model scales** and a **systematic attention analysis** (entropy and sparsity per layer and head), designed to observe how architectural width and depth affect both convergence and the internal structure of attention.
 
 ---
