@@ -1,4 +1,4 @@
-# LLmini — Scaling and Attention Dynamics in a Minimal Decoder-Only Transformer
+# LLmini Scaling and Attention Dynamics in a Minimal Decoder-Only Transformer
 
 ![Output](images/output.png)
 
