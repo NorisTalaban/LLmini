@@ -27,7 +27,7 @@ A GPT-style language model built from scratch in PyTorch, trained on ~14M tokens
 
 Most LLM papers report results at a single scale. Here, everything is fixed (data, optimizer, schedule, seed) except three tightly coupled hyperparameters: embedding dimension (`d_model`), number of attention heads, and number of layers. Every difference in the results can be traced back to those architectural choices alone.
 
-The second focus of the project is **attention behavior**. For each trained model, attention weights are extracted and analyzed through two complementary lenses: **entropy** (how diffuse or concentrated each head's attention distribution is) and **sparsity** (the fraction of near-zero weights). This analysis is not an afterthought — it is built into the evaluation pipeline from the start, to study how the internal structure of attention changes with model scale.
+The second focus of the project is **attention behavior**. For each trained model, attention weights are extracted and analyzed through two complementary lenses: **entropy** (how diffuse or concentrated each head's attention distribution is) and **sparsity** (the fraction of near-zero weights). This analysis is not an afterthought it is built into the evaluation pipeline from the start, to study how the internal structure of attention changes with model scale.
 
 The entire pipeline runs on a single Colab GPU (T4/L4) in under two hours per variant.
 
@@ -99,7 +99,7 @@ The corpus is assembled from **11 public English datasets** spanning narrative t
 | ARC-Challenge | 1,119 | 28,217 | 0.2% | 25.2 |
 | **Total** | **158,227** | **13,973,679** | **100%** | **88.3** |
 
-TinyStories and SQuAD dominate the token budget because their samples are longer (217 and 135 tokens on average), providing exposure to multi-sentence coherence. The token distribution is imbalanced (29.6% to 0.2%) — this is a known limitation, not a design choice.
+TinyStories and SQuAD dominate the token budget because their samples are longer (217 and 135 tokens on average), providing exposure to multi-sentence coherence. The token distribution is imbalanced (29.6% to 0.2%) this is a known limitation, not a design choice.
 
 ### Preprocessing
 
@@ -165,7 +165,7 @@ Model A reaches a final validation perplexity of 59.12 versus 94.88 for Model C.
 | 2 | −0.266 | −0.256 | −0.246 |
 | 3 | **+0.003** | −0.019 | −0.041 |
 
-Model A is the only variant to cross zero at epoch 3, suggesting it is beginning to memorize. Models B and C remain in the underfitting regime throughout. This is expected given the data budget: Hoffmann et al. (2022) established that compute-optimal training requires roughly 20 tokens per parameter. Model A would need on the order of a billion tokens by that estimate — the corpus provides ~14M, roughly 80× below the Chinchilla-optimal ratio. Under this lens, **all three models are severely data-starved**, and the fact that even Model A barely overfits confirms the dataset is the bottleneck, not the architecture.
+Model A is the only variant to cross zero at epoch 3, suggesting it is beginning to memorize. Models B and C remain in the underfitting regime throughout. This is expected given the data budget: Hoffmann et al. (2022) established that compute-optimal training requires roughly 20 tokens per parameter. Model A would need on the order of a billion tokens by that estimate the corpus provides ~14M, roughly 80× below the Chinchilla-optimal ratio. Under this lens, **all three models are severely data-starved**, and the fact that even Model A barely overfits confirms the dataset is the bottleneck, not the architecture.
 
 ### Compute
 
@@ -232,7 +232,7 @@ The overfitting analysis is consistent with the Chinchilla framework (Hoffmann e
 
 ### What These Results Do Not Show
 
-Since `d_model`, `num_heads`, and `num_layers` all change together, the individual contribution of each factor to the perplexity improvement **cannot be isolated**. Kaplan et al. (2020) found that at constant total parameters, specific choices of width versus depth have "minimal effects within a wide range" — this design does not test this because total parameters also change across variants.
+Since `d_model`, `num_heads`, and `num_layers` all change together, the individual contribution of each factor to the perplexity improvement **cannot be isolated**. Kaplan et al. (2020) found that at constant total parameters, specific choices of width versus depth have "minimal effects within a wide range" this design does not test this because total parameters also change across variants.
 
 The attention analysis is descriptive, not causal. The observation that deeper models develop sharper attention patterns could be a consequence of lower loss rather than a cause of it. Establishing causality would require interventional experiments (e.g., pruning specific heads and measuring the impact on loss).
 
@@ -244,15 +244,15 @@ This project is a starting point. Several directions are planned to address its 
 
 ### Scaling the Data
 
-The most immediate bottleneck is the corpus size. At ~14M tokens, all three models are severely data-starved relative to their capacity (the Chinchilla ratio suggests ~1B tokens even for the smallest variant). The next step is to scale the training data by one or two orders of magnitude — targeting 500M–1B tokens — by expanding the existing sources (full WikiText-103 instead of WikiText-2, full SQuAD and BoolQ, larger slices of TinyStories) and adding new high-quality corpora: OpenWebText, BookCorpus, RedPajama subsets, arXiv abstracts for technical language, and GitHub code for structured reasoning patterns. This would also resolve the 66% padding overhead: with more long-form text, the length distribution would shift and the packing strategy (concatenating multiple short texts into a single chunk instead of padding) becomes both feasible and necessary. A larger corpus would allow observation of whether the attention entropy/sparsity patterns change when the models are no longer data-limited, and whether Model A's slight overfitting at epoch 3 turns into genuine generalization improvement with sufficient data.
+The most immediate bottleneck is the corpus size. At ~14M tokens, all three models are severely data-starved relative to their capacity (the Chinchilla ratio suggests ~1B tokens even for the smallest variant). The next step is to scale the training data by one or two orders of magnitude targeting 500M–1B tokens by expanding the existing sources (full WikiText-103 instead of WikiText-2, full SQuAD and BoolQ, larger slices of TinyStories) and adding new high-quality corpora: OpenWebText, BookCorpus, RedPajama subsets, arXiv abstracts for technical language, and GitHub code for structured reasoning patterns. This would also resolve the 66% padding overhead: with more long-form text, the length distribution would shift and the packing strategy (concatenating multiple short texts into a single chunk instead of padding) becomes both feasible and necessary. A larger corpus would allow observation of whether the attention entropy/sparsity patterns change when the models are no longer data-limited, and whether Model A's slight overfitting at epoch 3 turns into genuine generalization improvement with sufficient data.
 
 ### Exploring Reasoning
 
-The current model is a pure next-token predictor with no explicit reasoning capability. A natural evolution is to explore whether structured reasoning can emerge or be induced at this scale. Concretely, this means training on chain-of-thought traces from GSM8K and ARC (not just the questions, but the step-by-step solutions), adding synthetic reasoning datasets (e.g., logical deductions, simple arithmetic sequences), and evaluating on tasks that require multi-step inference. The question is not whether a 50M-parameter model can compete with GPT-4 on reasoning — it cannot — but whether the *onset* of reasoning-like behavior can be observed: does the model learn to produce intermediate steps before a final answer? Does the attention pattern change when the input contains a chain-of-thought versus a flat question? This connects directly to the existing attention analysis: if reasoning relies on specific attention structures (e.g., heads that attend to previous reasoning steps), the entropy/sparsity framework is already in place to detect it.
+The current model is a pure next-token predictor with no explicit reasoning capability. A natural evolution is to explore whether structured reasoning can emerge or be induced at this scale. Concretely, this means training on chain-of-thought traces from GSM8K and ARC (not just the questions, but the step-by-step solutions), adding synthetic reasoning datasets (e.g., logical deductions, simple arithmetic sequences), and evaluating on tasks that require multi-step inference. The question is not whether a 50M-parameter model can compete with GPT-4 on reasoning it cannot but whether the *onset* of reasoning-like behavior can be observed: does the model learn to produce intermediate steps before a final answer? Does the attention pattern change when the input contains a chain-of-thought versus a flat question? This connects directly to the existing attention analysis: if reasoning relies on specific attention structures (e.g., heads that attend to previous reasoning steps), the entropy/sparsity framework is already in place to detect it.
 
 ### Scaling the Model with Serious Compute
 
-The current ablation runs on a single T4 GPU in under two hours. The architecture and training loop are designed to scale beyond this. With access to multi-GPU infrastructure (A100 or H100 nodes), the plan is to scale along three axes simultaneously: model size (d_model=768, 12 heads, 16+ layers — approaching GPT-2 small), context window (1024 or 2048 tokens), and training duration (10–20 epochs on the larger corpus). This would require implementing distributed training (FSDP or DeepSpeed ZeRO), gradient checkpointing to fit larger models in memory, and a more sophisticated data pipeline with streaming and dynamic batching. The ablation framework would extend naturally: instead of three variants at ~30–60M parameters, the comparison would span from 50M to 300M+, which is the range where Kaplan et al. (2020) observed the clearest power-law scaling behavior. The goal is to test whether the attention patterns documented in this project (diffuse early → sparse middle → relaxed final) hold at larger scale, or whether new structures emerge that are invisible at the current size.
+The current ablation runs on a single T4 GPU in under two hours. The architecture and training loop are designed to scale beyond this. With access to multi-GPU infrastructure (A100 or H100 nodes), the plan is to scale along three axes simultaneously: model size (d_model=768, 12 heads, 16+ layers approaching GPT-2 small), context window (1024 or 2048 tokens), and training duration (10–20 epochs on the larger corpus). This would require implementing distributed training (FSDP or DeepSpeed ZeRO), gradient checkpointing to fit larger models in memory, and a more sophisticated data pipeline with streaming and dynamic batching. The ablation framework would extend naturally: instead of three variants at ~30–60M parameters, the comparison would span from 50M to 300M+, which is the range where Kaplan et al. (2020) observed the clearest power-law scaling behavior. The goal is to test whether the attention patterns documented in this project (diffuse early → sparse middle → relaxed final) hold at larger scale, or whether new structures emerge that are invisible at the current size.
 
 ### Other Improvements
 
@@ -330,9 +330,9 @@ LLmini/
 ```
 
 **Note**: The `LLmini_STEM_model/` directory is created automatically when running the notebooks in Google Colab and contains:
-- `pytorch_model.bin` — Final trained weights
-- `best_model.pt` — Best checkpoint during training
-- `model_config.json` — Architecture configuration
+- `pytorch_model.bin` --> Final trained weights
+- `best_model.pt` --> Best checkpoint during training
+- `model_config.json` --> Architecture configuration
 - Tokenizer files (GPT-2 BPE)
 
 ---
